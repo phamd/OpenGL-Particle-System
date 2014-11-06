@@ -1,8 +1,8 @@
 #include <GL/glut.h>
 #include <list>
 #include <stdio.h>
-#include "containers.h"
-#include "particlesystem.h"
+#include "Vector3.h"
+#include "ParticleSystem.h"
 #include "calculations.h"
 #include <string> // std::to_string
 

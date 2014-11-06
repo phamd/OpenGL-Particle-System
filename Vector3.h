@@ -1,5 +1,5 @@
-#ifndef __CONTAINERS_H__
-#define __CONTAINERS_H__
+#ifndef __VECTOR3_H__
+#define __VECTOR3_H__
 
 class Vector3
 {

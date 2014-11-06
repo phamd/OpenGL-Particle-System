@@ -1,7 +1,7 @@
 #ifndef __PARTICLESYSTEM_H__
 #define __PARTICLESYSTEM_H__
 #include <list>
-#include "containers.h"
+#include "Vector3.h"
 
 class Particle
 { 

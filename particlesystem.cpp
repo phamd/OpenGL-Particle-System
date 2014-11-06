@@ -1,4 +1,4 @@
-#include "particlesystem.h"
+#include "ParticleSystem.h"
 
 Particle::Particle(void)
 {

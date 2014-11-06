@@ -1,4 +1,4 @@
-SRC = main.cpp containers.cpp calculations.cpp particlesystem.cpp
+SRC = main.cpp Vector3.cpp calculations.cpp ParticleSystem.cpp
 EXE = ParticleSystem
 
 CXX = g++
