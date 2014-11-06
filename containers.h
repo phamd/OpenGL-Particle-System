@@ -13,6 +13,7 @@ public:
 	Vector3(float, float, float);
 	Vector3(void);
 	Vector3 directionTo(Vector3);
+	void randomize(void);
 	void add(Vector3);
 	void scale(float);
 	float dot(Vector3);

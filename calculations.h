@@ -4,6 +4,5 @@
 #include "containers.h"
 
 float randFloat(float s, float t);
-Vector3 randomColor(void);
 
 #endif

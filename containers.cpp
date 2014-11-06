@@ -1,17 +1,21 @@
 #include "containers.h"
+#include <cstdlib>
 #include <math.h>
 
-Vector3::Vector3(float x, float y, float z) {
+Vector3::Vector3(float x, float y, float z)
+{
 	this->x = x;
 	this->y = y;
 	this->z = z;
 }
 
-Vector3::Vector3(void) {
+Vector3::Vector3(void)
+{
 	x = y = z = 0;
 }
 
-Vector3 Vector3::directionTo(Vector3 f) {
+Vector3 Vector3::directionTo(Vector3 f)
+{
 	float deltaX = f.x - x;
 	float deltaY = f.y - y;
 	float deltaZ = f.z - z;
@@ -21,18 +25,28 @@ Vector3 Vector3::directionTo(Vector3 f) {
 				   (deltaZ == 0) ? 0 : deltaZ / length);
 }
 
-void Vector3::add(Vector3 other) {
+void Vector3::randomize(void)
+{
+	x = (float)rand() / float(RAND_MAX);
+	y = (float)rand() / float(RAND_MAX);
+	z = (float)rand() / float(RAND_MAX);
+}
+
+void Vector3::add(Vector3 other)
+{
 	x += other.x;
 	y += other.y;
 	z += other.z;
 }
 
-void Vector3::scale(float scale) {
+void Vector3::scale(float scale)
+{
 	x *= scale;
 	y *= scale;
 	z *= scale;
 }
 
-float Vector3::dot(Vector3 other) {
+float Vector3::dot(Vector3 other)
+{
 	return x*other.x + y*other.y + z*other.z;
 }
