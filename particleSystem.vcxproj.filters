@@ -18,27 +18,27 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="containers.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="calculations.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="particlesystem.cpp">
+    <ClCompile Include="Vector3.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="containers.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="calculations.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="particlesystem.h">
+    <ClInclude Include="object.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="object.h">
+    <ClInclude Include="Vector3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

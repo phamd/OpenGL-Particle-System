@@ -14,15 +14,13 @@ Vector3::Vector3(void)
 	x = y = z = 0;
 }
 
-Vector3 Vector3::directionTo(Vector3 f)
+Vector3 Vector3::directionTo(Vector3 other)
 {
-	float deltaX = f.x - x;
-	float deltaY = f.y - y;
-	float deltaZ = f.z - z;
-	float length = sqrt(deltaX*deltaX + deltaY*deltaY + deltaZ*deltaZ);
-	return Vector3((deltaX == 0) ? 0 : deltaX / length,
-				   (deltaY == 0) ? 0 : deltaY / length,
-				   (deltaZ == 0) ? 0 : deltaZ / length);
+	Vector3 delta = { other.x - x, other.y - y, other.z - z };
+	delta.x = (delta.x == 0) ? 0 : delta.x / delta.length();
+	delta.y = (delta.y == 0) ? 0 : delta.y / delta.length();
+	delta.z = (delta.z == 0) ? 0 : delta.z / delta.length();
+	return delta;
 }
 
 void Vector3::randomize(void)
@@ -49,4 +47,14 @@ void Vector3::scale(float scale)
 float Vector3::dot(Vector3 other)
 {
 	return x*other.x + y*other.y + z*other.z;
+}
+
+float Vector3::length(void)
+{
+	return sqrt(x*x + y*y + z*z);
+}
+
+float Vector3::angle(Vector3 other)
+{
+	return this->dot(other) / (abs(this->length())*(abs(other.length())));
 }

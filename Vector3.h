@@ -17,6 +17,8 @@ public:
 	void add(Vector3);
 	void scale(float);
 	float dot(Vector3);
+	float length(void);
+	float angle(Vector3);
 };
 
 #endif

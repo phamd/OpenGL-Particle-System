@@ -16,8 +16,20 @@ public:
 	float speed;
 	float size;
 	float age;
+	float friction;
 	Shape shape;
 	Particle(void);
+};
+
+class Cannon
+{
+public:
+	Vector3 positionBase;
+	Vector3 positionSpout;
+	Vector3 direction;
+	float spread;
+	Cannon(void);
+	Cannon(Vector3, Vector3, Vector3, float);
 };
 
 class ParticleSystem
@@ -30,14 +42,16 @@ public:
 	ParticleSystem(void);
 	iter begin();
 	iter end();
+	void createParticle(float num, Cannon cannon);
 	void update(float deltaTime);
 	void append(Particle);
 	void setState(State);
 	void clear(void);
 	bool hasFriction;
 	bool hasGravity;
-	//bool hasSpin; 
+	bool hasWind;
 	float gravity;
+	float wind;
 	int maxAge;
 	State state;
 	int particleRotationAngle;

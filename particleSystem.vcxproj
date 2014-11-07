@@ -81,15 +81,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="calculations.cpp" />
-    <ClCompile Include="containers.cpp" />
+    <ClCompile Include="Vector3.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="particlesystem.cpp" />
+    <ClCompile Include="ParticleSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="calculations.h" />
-    <ClInclude Include="containers.h" />
+    <ClInclude Include="Vector3.h" />
     <ClInclude Include="object.h" />
-    <ClInclude Include="particlesystem.h" />
+    <ClInclude Include="ParticleSystem.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Makefile" />
