@@ -1,64 +1,48 @@
+/* Tested with
+	Platforms : Windows
+	IDE/compiler: VS2013, MinGW(g++)
+*/
+
+/* Additional Features
+	1. Particle lifespan
+	2. Particle spin
+	3. Particle floor collision
+	4. Friction mode
+	5. Scene rotation
+	6. Start/Stop Simulation
+	7. Reset key
+	8. Backface culling, double buffering, perspective projection
+	12. Particle cam
+	14. Lighting
+	16. Particle cannon
+	17. Wind
+*/
+
+#ifdef __APPLE__
+#include <GLUT/glut.h>
+#include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
+#else
 #include <GL/glut.h>
+#endif
 #include <list>
 #include <stdio.h>
 #include "Vector3.h"
 #include "ParticleSystem.h"
 #include "calculations.h"
-#include <string> // std::to_string // debug
-
-/* Features
- * 1. Particle lifespan
- * 2. Particle spin
- * 3. Particle floor collision
- * 4. Friction mode
- * 5. Scene rotation
- * 6. Start/Stop Simulation
- * 7. Reset key
- * 8. Backface culling, double buffering, perspective projection
- * 12. Particle cam
- * 14. Lighting (no normal vectors)
- * 17. Wind
- */
 
 Vector3 camPos = { -40, 38, 30 };
 Vector3 cannonBase = { -5, 30, -10 }; // particle origin & cannon start position
 Cannon cannon = Cannon(
-	cannonBase,
-	{ cannonBase.x, cannonBase.y - 1, cannonBase.z + 1 },
-	{ cannonBase.x, cannonBase.y - 1, cannonBase.z + 1 },
-	0.9);
+	cannonBase,	{ cannonBase.x, cannonBase.y - 1, cannonBase.z + 1 },
+	0.9f, 0.1f);
 ParticleSystem particleSystem;
-
-int flowRate = 4;
-bool flowEnabled = true;
-
-// Particle cam
-bool particleCamEnabled = false;
 Particle* particleCam;
-int particleCamAge;
-
-// time
+bool particleCamEnabled = false;
+int particleCamAge = 0;
+bool flowEnabled = true;
+int flowRate = 4;
 int totalTime = 0;
-int gdeltaTime; // debug
-
-
-void drawSentence(const char* line, float startX, float startY) // debug
-{
-	glRasterPos2f(startX, startY);
-	glColor3f(1.0f, 1.0f, 1.0f);
-	for (size_t i = 0; i < std::strlen(line); ++i) {
-		glutBitmapCharacter(GLUT_BITMAP_9_BY_15, line[i]);
-	}
-}
-
-void drawDebug(void) // debug
-{
-			std::string debugText= "deltatime: " + std::to_string(gdeltaTime);
-
-			for (int i = 0, Y = 20; i < 5; i++, Y += 20) {
-				drawSentence(debugText.c_str(), 10, Y);
-			}
-}
 
 void drawCannon(void)
 {
@@ -73,11 +57,10 @@ void drawCannon(void)
 
 	glPushMatrix(); // Draw Spout
 	glColor3f(0.5, 0.5, 0.5);
-	glTranslatef(cannon.direction.x, cannon.direction.y, cannon.direction.z);
+	glTranslatef(cannon.positionSpout.x, cannon.positionSpout.y, cannon.positionSpout.z);
 	glutSolidCube(2);
 	glPopMatrix();
 }
-
 
 void drawParticleSystem(void)
 {
@@ -90,44 +73,44 @@ void drawParticleSystem(void)
 				glutSolidCube(it->size);
 			else if (it->shape == Particle::Teapot)
 				glutSolidTeapot(it->size);
-			else
+			else // Sphere
 				glutSolidSphere(it->size, 16, 16);
 		glPopMatrix();
 	}
 }
 
 /* Draws a box centered at a given position.
-*     0 - 1
-*   /   / |
-*  4 -37  2
-*  |   | /
-*  5 - 6
+*           0 - 1
+*         /   / |
+*    +y  4 -37  2 -z
+*        |   | /
+* -x -y  5 - 6  +z +x
 */
-void drawBox(Vector3 center, Vector3 size) // note: add a tilt option
+void drawBox(Vector3 center, Vector3 size)
 {
 	float vertices[8][3] = {
-		{ center.x - size.x / 2, center.y + size.y / 2, center.z + size.z / 2 }, // back LT
-		{ center.x + size.x / 2, center.y + size.y / 2, center.z + size.z / 2 }, // back RT
-		{ center.x + size.x / 2, center.y - size.y / 2, center.z + size.z / 2 }, // back RB
-		{ center.x - size.x / 2, center.y - size.y / 2, center.z + size.z / 2 }, // back LB
-		{ center.x - size.x / 2, center.y + size.y / 2, center.z - size.z / 2 }, // front LT
-		{ center.x - size.x / 2, center.y - size.y / 2, center.z - size.z / 2 }, // front LB
-		{ center.x + size.x / 2, center.y - size.y / 2, center.z - size.z / 2 }, // front RB
-		{ center.x + size.x / 2, center.y + size.y / 2, center.z - size.z / 2 }  // front RT
+		{ center.x - size.x / 2, center.y + size.y / 2, center.z - size.z / 2 }, // back LT
+		{ center.x + size.x / 2, center.y + size.y / 2, center.z - size.z / 2 }, // back RT
+		{ center.x + size.x / 2, center.y - size.y / 2, center.z - size.z / 2 }, // back RB
+		{ center.x - size.x / 2, center.y - size.y / 2, center.z - size.z / 2 }, // back LB
+		{ center.x - size.x / 2, center.y + size.y / 2, center.z + size.z / 2 }, // front LT
+		{ center.x - size.x / 2, center.y - size.y / 2, center.z + size.z / 2 }, // front LB
+		{ center.x + size.x / 2, center.y - size.y / 2, center.z + size.z / 2 }, // front RB
+		{ center.x + size.x / 2, center.y + size.y / 2, center.z + size.z / 2 }  // front RT
 	};
 	
 	int faces[6][4] = {
 		{ 1, 2, 3, 0 }, // back
 		{ 0, 3, 5, 4 }, // left
 		{ 2, 6, 5, 3 }, // bottom
-		{ 1, 2, 6, 7 }, // right
+		{ 1, 7, 6, 2 }, // right
 		{ 0, 4, 7, 1 }, // top
 		{ 4, 5, 6, 7 }  // front
 	};
 
 	float normals[6][3] = {
 		{ 0, 0, -1 },
-		{ -1, 0, 0 }, // looking at this
+		{ -1, 0, 0 },
 		{ 0, -1, 0 },
 		{ 1, 0, 0 },
 		{ 0, 1, 0 },
@@ -135,12 +118,12 @@ void drawBox(Vector3 center, Vector3 size) // note: add a tilt option
 	};
 
 	float faceColors[6][3] = {
-		{ 0.3, 0.9, 0.5 },
-		{ 0.3, 0.9, 0.5 },
+		{ 0.3f, 0.9f, 0.5f },
+		{ 0.3f, 0.9f, 0.5f },
 		{ 0, 1, 1 },
-		{ 0.3, 0.9, 0.5 },
+		{ 0.3f, 0.9f, 0.5f },
 		{ 0, 0, 1 },
-		{ 0.3, 0.9, 0.5 }
+		{ 0.3f, 0.9f, 0.5f }
 	};
 
 	for (int i = 0; i < 6; i++) {
@@ -176,8 +159,6 @@ void display(void)
 	drawBox({ 0, -1, 0 }, { 100, 2, 100 });	
 	drawCannon();
 	drawParticleSystem();
-	drawDebug(); // debug
-
 	glutSwapBuffers();
 }
 
@@ -186,7 +167,6 @@ void update(int value)
 	int elapsedTime = glutGet(GLUT_ELAPSED_TIME);
 	int deltaTime = elapsedTime - totalTime;
 	totalTime = elapsedTime;
-	gdeltaTime = deltaTime; // debug
 
 	if (flowEnabled) {
 		particleSystem.createParticle(flowRate, cannon);
@@ -226,7 +206,7 @@ void keyboard(unsigned char key, int x, int y)
 		particleSystem.clear();
 		break;
 
-	case 'y': // takes the last particle, if it exists
+	case 'y': // takes the last particle, if one exists
 		particleCamEnabled = true;
 		particleCamAge = 0;
 		particleCam = (particleSystem.end()!=particleSystem.begin()) ? &*--particleSystem.end() : NULL;
@@ -240,35 +220,35 @@ void keyboard(unsigned char key, int x, int y)
 		particleSystem.hasWind = !particleSystem.hasWind;
 		break;
 	case 'u':
-		particleSystem.wind += (particleSystem.wind < 1) ? 0.1 : 0;
+		particleSystem.wind += (particleSystem.wind < 1) ? 0.1f : 0;
 		break;
 	case 'j':
-		particleSystem.wind += (particleSystem.wind > -1) ? -0.1 : 0;
+		particleSystem.wind += (particleSystem.wind > -1) ? -0.1f : 0;
 		break;
 
 	case 'w': 
-		if (cannon.direction.z > cannon.positionBase.z - 2)
-		cannon.direction.z -= 1;
+		if (cannon.positionSpout.z > cannon.positionBase.z - 2)
+		cannon.positionSpout.z -= 1;
 		break;
 	case 'a':
-		if (cannon.direction.x > cannon.positionBase.x - 2)
-		cannon.direction.x -= 1;
+		if (cannon.positionSpout.x > cannon.positionBase.x - 2)
+		cannon.positionSpout.x -= 1;
 		break;
 	case 's':
-		if (cannon.direction.z < cannon.positionBase.z + 2)
-		cannon.direction.z += 1;
+		if (cannon.positionSpout.z < cannon.positionBase.z + 2)
+		cannon.positionSpout.z += 1;
 		break;
 	case 'd':
-		if (cannon.direction.x < cannon.positionBase.x + 2)
-		cannon.direction.x += 1;
+		if (cannon.positionSpout.x < cannon.positionBase.x + 2)
+		cannon.positionSpout.x += 1;
 		break;
 	case 'c':
-		if (cannon.direction.y > cannon.positionBase.y - 2)
-			cannon.direction.y -= 1;
+		if (cannon.positionSpout.y > cannon.positionBase.y - 2)
+			cannon.positionSpout.y -= 1;
 		break;
 	case 'e':
-		if (cannon.direction.y < cannon.positionBase.y + 2)
-			cannon.direction.y += 1;
+		if (cannon.positionSpout.y < cannon.positionBase.y + 2)
+			cannon.positionSpout.y += 1;
 		break;
 
 	case 'q':
@@ -281,16 +261,22 @@ void special(int key, int x, int y)
 {
 	switch (key) {
 	case GLUT_KEY_LEFT:
-		camPos.y -= 10;
+		camPos.y -= 1;
 		break;
 	case GLUT_KEY_RIGHT:
-		camPos.y += 10;
+		camPos.y += 1;
 		break;
 	case GLUT_KEY_DOWN:
-		camPos.x -= 10;
+		camPos.x -= 1;
 		break;
 	case GLUT_KEY_UP:
-		camPos.x += 10;
+		camPos.x += 1;
+		break;
+	case GLUT_KEY_PAGE_UP:
+		camPos.z += 1;
+		break;
+	case GLUT_KEY_PAGE_DOWN:
+		camPos.z -= 1;
 		break;
 	}
 }
@@ -303,28 +289,24 @@ void reshape(int w, int h)
 	gluPerspective(60, (float)w / (float)h, 1, 500);
 }
 
-
 void init(void)
 {
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
-	glFrontFace(GL_CW);
+	glFrontFace(GL_CCW);
 	glCullFace(GL_BACK);
 	glClearColor(0, 0, 0, 0);
 	
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
 
-	float position[4] = {30, 5, 0, 0};
-
-	float amb[4] = { 1, 1, 1, 1 };
-	float diff[4] = { 1, 1, 1, 1 };
-	float spec[4] = { 1, 1, 1, 1 };
+	float position[4] = {30, 50, 0, 0};
+	float pureWhite[4] = { 1, 1, 1, 1 };
 
 	glLightfv(GL_LIGHT0, GL_POSITION, position);
-	glLightfv(GL_LIGHT0, GL_AMBIENT, amb);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, diff);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, spec);
+	glLightfv(GL_LIGHT0, GL_AMBIENT, pureWhite);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, pureWhite);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, pureWhite);
 
 	glEnable(GL_COLOR_MATERIAL);
 }
@@ -332,24 +314,26 @@ void init(void)
 int main(int argc, char* argv[])
 {
 	printf(
-		"Help: \
-		Key        | Function \n\
-		--------------------------------\n\
-		Arrow Keys | Camera position \n\
-		w,a,s,d    | Cannon angle left/right \n\
-		e,c        | Cannon angle up/down \n\
-		space      | Toggle particle flow \n\
-		+,-        | +/- flow rate \n\
-		f          | Toggle Friction \n\
-		g          | Toggle gravity \n\
-		i          | Toggle Wind \n\
-		u,j        | +/- Wind Power \n\
-		r          | Clear particles \n\
-		y          | Particle Cam \n\
-		b          | Burst 100 particles \n\
-		\n\n\
-		The two floating cubes denote the angle of the cannon. \n\
-		");
+	"Help: \
+	Key        | Function \n\
+	--------------------------------\n\
+	Arrow Keys | Camera x,y-position \n\
+	PgUp,PgDwn | Camera z-position \n\
+	w,a,s,d    | Cannon angle left/right \n\
+	e,c        | Cannon angle up/down \n\
+	space      | Toggle particle flow \n\
+	+,-        | +/- flow rate \n\
+	f          | Toggle Friction \n\
+	g          | Toggle gravity \n\
+	i          | Toggle Wind \n\
+	u,j        | +/- Wind Power \n\
+	r          | Clear particles \n\
+	y          | Particle Cam \n\
+	b          | Burst 100 particles \n\
+	\n\n\
+	The two floating cubes denote the angle of the particle cannon. \n\
+	Something to try: Turn off gravity and point the cannon in the sky. \n\
+	");
 
 	#ifdef _WIN32
 		system("PAUSE"); // "Press any key to continue"

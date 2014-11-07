@@ -26,10 +26,11 @@ class Cannon
 public:
 	Vector3 positionBase;
 	Vector3 positionSpout;
-	Vector3 direction;
-	float spread;
+	float spread; // The random adjustment to the angle of particles leaving the spout.
+	float radius; // The radius of the spout; e.g. a rain cloud would be given a large radius.
 	Cannon(void);
-	Cannon(Vector3, Vector3, Vector3, float);
+	Cannon(Vector3, Vector3, float, float);
+	Vector3 getDirection(void);
 };
 
 class ParticleSystem
@@ -37,15 +38,15 @@ class ParticleSystem
 private:
 	std::list<Particle> list;
 public:
-	enum State { Falling, Exploding};
+	//enum State { Falling, Exploding}; 
 	typedef std::list<Particle>::iterator iter;
 	ParticleSystem(void);
 	iter begin();
 	iter end();
-	void createParticle(float num, Cannon cannon);
-	void update(float deltaTime);
+	void createParticle(int flowRate, Cannon cannon); // There can be many cannons in a system.
+	void update(float deltaTime); // All the particle math is done here
 	void append(Particle);
-	void setState(State);
+	//void setState(State);
 	void clear(void);
 	bool hasFriction;
 	bool hasGravity;
@@ -53,7 +54,7 @@ public:
 	float gravity;
 	float wind;
 	int maxAge;
-	State state;
+	//State state;
 	int particleRotationAngle;
 };
 
