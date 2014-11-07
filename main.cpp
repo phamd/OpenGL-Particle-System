@@ -101,7 +101,7 @@ void drawBox(Vector3 center, Vector3 size)
 		{ center.x + size.x / 2, center.y - size.y / 2, center.z + size.z / 2 }, // front RB
 		{ center.x + size.x / 2, center.y + size.y / 2, center.z + size.z / 2 }  // front RT
 	};
-	
+
 	int faces[6][4] = {
 		{ 1, 2, 3, 0 }, // back
 		{ 0, 3, 5, 4 }, // left
@@ -149,9 +149,9 @@ void display(void)
 		if (particleCam == NULL || particleCam->age < particleCamAge)
 			particleCamEnabled = false;
 		else
-			gluLookAt(particleCam->position.x, particleCam->position.y, 
-			particleCam->position.z, particleCam->position.x + particleCam->direction.x, 
-			particleCam->position.y + particleCam->direction.y, 
+			gluLookAt(particleCam->position.x, particleCam->position.y,
+			particleCam->position.z, particleCam->position.x + particleCam->direction.x,
+			particleCam->position.y + particleCam->direction.y,
 			particleCam->position.z + particleCam->direction.z, 0, 1, 0);
 	}
 	else {
@@ -159,7 +159,7 @@ void display(void)
 	}
 	glColor3f(1, 1, 1);
 
-	drawBox({ 0, -1, 0 }, { 100, 2, 100 });	
+	drawBox({ 0, -1, 0 }, { 100, 2, 100 });
 	drawCannon();
 	drawParticleSystem();
 	glutSwapBuffers();
@@ -219,6 +219,10 @@ void keyboard(unsigned char key, int x, int y)
 		particleSystem.hasGravity = !particleSystem.hasGravity;
 		break;
 
+	case 'z': // fast mode (cubes only)
+		particleSystem.cubesOnly = !particleSystem.cubesOnly;
+		break;
+
 	case 'i':
 		particleSystem.hasWind = !particleSystem.hasWind;
 		break;
@@ -229,7 +233,7 @@ void keyboard(unsigned char key, int x, int y)
 		particleSystem.wind += (particleSystem.wind > -1) ? -0.1f : 0;
 		break;
 
-	case 'w': 
+	case 'w':
 		if (cannon.positionSpout.z > cannon.positionBase.z - 2)
 		cannon.positionSpout.z -= 1;
 		break;
@@ -299,7 +303,7 @@ void init(void)
 	glFrontFace(GL_CCW);
 	glCullFace(GL_BACK);
 	glClearColor(0, 0, 0, 0);
-	
+
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
 
@@ -333,6 +337,7 @@ int main(int argc, char* argv[])
 	r          | Clear particles \n\
 	y          | Particle Cam \n\
 	b          | Burst 100 particles \n\
+	z          | Fast mode (Cubes only) \n\
 	\n\n\
 	The two floating cubes denote the angle of the particle cannon. \n\
 	Something to try: Turn off gravity and point the cannon in the sky. \n\

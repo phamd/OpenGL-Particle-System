@@ -4,7 +4,7 @@
 #include "Vector3.h"
 
 class Particle
-{ 
+{
 public:
 	enum Shape { Sphere, Cube, Teapot };
 	Vector3 position;
@@ -38,7 +38,7 @@ class ParticleSystem
 private:
 	std::list<Particle> list;
 public:
-	//enum State { Falling, Exploding}; 
+	//enum State { Falling, Exploding };
 	typedef std::list<Particle>::iterator iter;
 	ParticleSystem(void);
 	iter begin();
@@ -51,6 +51,7 @@ public:
 	bool hasFriction;
 	bool hasGravity;
 	bool hasWind;
+	bool cubesOnly; // render speed is much faster with cubes only
 	float gravity;
 	float wind;
 	int maxAge;

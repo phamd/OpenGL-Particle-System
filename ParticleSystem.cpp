@@ -19,6 +19,7 @@ ParticleSystem::ParticleSystem(void)
 	gravity = -0.3f;
 	wind = 0.5f;
 	maxAge = 150;
+	cubesOnly = false;
 }
 
 void ParticleSystem::update(float deltaTime)
@@ -27,7 +28,7 @@ void ParticleSystem::update(float deltaTime)
 
 	// particle rotation angle (individual particles still spin at their own speeds)
 	particleRotationAngle = (particleRotationAngle >= 350) ? 0 : (particleRotationAngle+10);
-	
+
 	for (auto it = begin(); it != end(); ) {
 		// update position
 		if (hasGravity) { // move y
@@ -41,9 +42,9 @@ void ParticleSystem::update(float deltaTime)
 		} // move x,z
 		it->position.x += (hasWind) ? (it->velocity.x + wind) * deltaTime : it->velocity.x * deltaTime;
 		it->position.z += (hasWind) ? (it->velocity.z + wind) * deltaTime : it->velocity.z * deltaTime;
-		
+
 		// hardcoded floor collision and bouncing
-		if (absf(it->position.x) < 50 && absf(it->position.z) < 50  && it->position.y < 1) { 
+		if (absf(it->position.x) < 50 && absf(it->position.z) < 50  && it->position.y < 1) {
 			// checks current position, not next; otherwise particles bounce off the air.
 			it->position.y = 1.000001f; // nudge up slightly, so it can bounce up
 			it->velocity.y = (absf(it->velocity.y) < 0.9) ? 0 : it->velocity.y; // stops flickering of bounces
@@ -64,7 +65,6 @@ void ParticleSystem::update(float deltaTime)
 	}
 }
 
-
 void ParticleSystem::createParticle(int flowRate, Cannon cannon)
 {
 	for (int i = 0; i < flowRate; i++) {
@@ -83,8 +83,12 @@ void ParticleSystem::createParticle(int flowRate, Cannon cannon)
 		p.velocity.scale(p.size * p.speed); // bigger shapes bounce farther
 		p.color.randomize();
 		p.spin.randomize();
-		p.shape = (randFloat(0, 1) < 0.50f) ? Particle::Sphere : (randFloat(0, 1) < 0.80f) ?
+		if (cubesOnly) {
+			p.shape = Particle::Cube;
+		} else {
+			p.shape = (randFloat(0, 1) < 0.50f) ? Particle::Sphere : (randFloat(0, 1) < 0.80f) ?
 			Particle::Cube : Particle::Teapot; // (0.5-0.5*0.8)% chance of teapot
+		}
 		list.push_back(p); // Add to particle list
 	}
 }
