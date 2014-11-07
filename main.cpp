@@ -1,6 +1,9 @@
 /* Tested with
-	Platforms : Windows
+	Platform : Windows
 	IDE/compiler: VS2013, MinGW(g++)
+
+	Platform: Debian (Linux)
+	IDE/compiler: g++ 4.7.2
 */
 
 /* Additional Features
