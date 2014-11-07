@@ -32,9 +32,6 @@
     <ClInclude Include="calculations.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="object.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Vector3.h">
       <Filter>Header Files</Filter>
     </ClInclude>
